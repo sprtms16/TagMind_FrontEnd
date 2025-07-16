@@ -22,3 +22,6 @@ Desktop.ini
 
 # Sensitive files
 key.properties
+
+# Temporary files
+commit_message.txt
