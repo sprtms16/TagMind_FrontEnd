@@ -24,7 +24,7 @@ class Diary {
       content: json['content'],
       createdAt: DateTime.parse(json['created_at']),
       imageUrl: json['image_url'],
-      tags: List<String>.from(json['tags'].map((tag) => tag['name'])),
+      tags: List<String>.from(json['tags']?.map((tag) => tag['name']) ?? []),
     );
   }
 }
