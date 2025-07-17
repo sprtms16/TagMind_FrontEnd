@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/diary_provider.dart';
 import '../models/diary.dart';
+import './diary_edit_screen.dart';
 
 class DiaryListScreen extends StatefulWidget {
   @override
@@ -21,6 +22,14 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Diaries'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).pushNamed(DiaryEditScreen.routeName);
+            },
+          ),
+        ],
       ),
       body: Consumer<DiaryProvider>(
         builder: (context, diaryProvider, child) {
@@ -57,6 +66,28 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                             .map((tag) => Chip(label: Text(tag)))
                             .toList(),
                       ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              DiaryEditScreen.routeName,
+                              arguments: diaryProvider.diaries[i].id,
+                            );
+                          },
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () async {
+                            await diaryProvider.deleteDiary(diaryProvider.diaries[i].id);
+                          },
+                          color: Theme.of(context).errorColor,
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -66,7 +97,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Navigate to Diary Creation Screen
+          Navigator.of(context).pushNamed(DiaryEditScreen.routeName);
         },
         child: Icon(Icons.add),
       ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './providers/auth_provider.dart';
+import './providers/diary_provider.dart';
 import './screens/auth_screen.dart';
+import './screens/diary_list_screen.dart';
+import './screens/diary_edit_screen.dart';
 
 void main() {
   runApp(
@@ -64,7 +67,11 @@ class MyApp extends StatelessWidget {
           return auth.token != null ? DiaryListScreen() : const AuthScreen();
         },
       ),
+      routes: {
+        DiaryEditScreen.routeName: (ctx) => DiaryEditScreen(),
+      },
     );
   }
 }
+
 
