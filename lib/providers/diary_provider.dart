@@ -36,31 +36,31 @@ class DiaryProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addDiary(Diary diary) async {
+  Future<void> addDiary(Diary diary, {XFile? imageFile}) async {
     final url = Uri.parse('$_baseUrl/diaries');
     final token = await _storage.read(key: 'jwt_token');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode({
-          'title': diary.title,
-          'content': diary.content,
-          'image_url': diary.imageUrl,
-          'tags': diary.tags,
-        }),
-      );
+      final request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields['title'] = diary.title;
+      request.fields['content'] = diary.content;
+      request.fields['tags'] = json.encode(diary.tags); // Tags as JSON string
+
+      if (imageFile != null) {
+        request.files.add(await http.MultipartFile.fromXFile(imageFile));
+      }
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        final newDiary = Diary.fromJson(json.decode(response.body));
+        final newDiary = Diary.fromJson(json.decode(responseBody));
         _diaries.add(newDiary);
         notifyListeners();
       } else {
-        print('Failed to add diary: ${response.statusCode} ${response.body}');
+        print('Failed to add diary: ${response.statusCode} $responseBody');
         throw Exception('Failed to add diary');
       }
     } catch (error) {

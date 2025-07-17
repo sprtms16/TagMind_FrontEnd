@@ -1,0 +1,5 @@
+feat: Implement image upload in frontend addDiary function
+
+- Modified `addDiary` to use `MultipartRequest` for image uploads.
+- Added `imageFile` as an optional parameter to `addDiary`.
+- Ensured `title`, `content`, and `tags` are sent as fields in the multipart request.
