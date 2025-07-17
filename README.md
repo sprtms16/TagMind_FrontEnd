@@ -16,15 +16,20 @@
 
 ## 주요 기능
 
-- **마찰 없는 일기 작성:** 앱을 열자마자 바로 생각을 기록할 수 있는 단순하고 직관적인 UI
-- **지능형 자동 태깅:** 일기 내용을 분석하여 관련 태그(인물, 활동, 감정, 장소 등)를 자동으로 추천
-- **데이터 시각화:** 'Year in Pixels' 스타일의 기분 달력, 태그-감정 상관관계 분석 등 다양한 차트를 통해 자신의 삶을 시각적으로 탐색
-- **감성적 게임화:** '마음의 정원' 컨셉을 통해 기록 활동에 대한 감성적 보상과 장기적인 동기 부여
+TagMind는 단순한 일기장을 넘어, 사용자의 삶을 더 깊이 이해하도록 돕는 지능형 동반자입니다.
+
+- **마찰 없는 일기 작성 (Frictionless Entry):** 앱을 열자마자 바로 생각을 기록할 수 있는 단순하고 직관적인 UI를 제공하여, 꾸준한 기록 습관을 지원합니다.
+- **지능형 자동 태깅 (Intelligent Tagging Engine):** 사용자가 일기를 저장하면, AI가 백그라운드에서 내용을 분석하여 관련 태그(인물, 활동, 감정, 장소 등)를 자동으로 추천하고 생성합니다. 사용자는 수동으로 태그를 추가하거나 수정할 수도 있습니다.
+- **핵심 데이터 시각화 (Core Visualization):**
+  - **타임라인/캘린더 뷰:** 작성된 일기를 시간 순서나 달력 형태로 쉽게 탐색할 수 있습니다.
+  - **인사이트 대시보드:** 'Year in Pixels' 스타일의 기분 달력, 태그-감정 상관관계 분석 등 다양한 차트를 통해 자신의 삶의 패턴을 시각적으로 탐색합니다.
+- **감성적 게임화 (Emotional Gamification):** '마음의 정원' 컨셉을 통해, 일기를 기록할수록 자신만의 정원이 성장하는 감성적 보상을 제공하여 장기적인 동기를 부여합니다.
+- **기본 검색 (Basic Search):** 텍스트 내용이나 태그를 기반으로 과거의 일기를 빠르게 검색할 수 있습니다.
 
 ## 기술 스택
 
 - **Framework:** Flutter
-- **State Management:** Provider / Riverpod (예정)
+- **State Management:** Provider
 - **HTTP Client:** Dio
 - **Storage:** flutter_secure_storage (인증 토큰), shared_preferences (사용자 설정)
 - **Linting:** lint
@@ -34,8 +39,8 @@
 1.  **Flutter 설치:** [공식 문서](https://flutter.dev/docs/get-started/install)를 참고하여 Flutter SDK를 설치합니다.
 2.  **리포지토리 클론:**
     ```bash
-    git clone https://github.com/sprtms16/TagMind_FrontEnd.git
-    cd TagMind_FrontEnd
+    git clone https://github.com/your-username/TagMind.git
+    cd TagMind/frontend
     ```
 3.  **의존성 설치:**
     ```bash
@@ -48,7 +53,33 @@
 
 ## 개발 로드맵
 
-상세한 개발 Task는 [WBS(Work Breakdown Structure)](./frontend_development_plan.md) 문서를 참고하세요. (추후 이 README에 통합 예정)
+프로젝트는 4단계의 린(Lean)하고 반복적인 접근법을 따릅니다.
+
+### 1단계: 발견, 기획 및 디자인 (1-4주차)
+- **WBS 1.1:** 시장 및 사용자 리서치
+- **WBS 1.2:** 제품 전략 및 로드맵 확정
+- **WBS 1.3:** UX/UI 디자인 (와이어프레임, 목업, 프로토타입)
+- **WBS 1.4:** 기술 아키텍처 설계
+
+### 2단계: 최소 기능 제품(MVP) 개발 (5-12주차)
+- **WBS 2.1:** 백엔드 개발 (사용자 인증, 기본 API, DB)
+- **WBS 2.2:** 프론트엔드 개발 (핵심 UI/UX)
+- **WBS 2.3:** 핵심 기능 구현 (일기 CRUD, 수동 태깅, 캘린더/타임라인 뷰, 기본 검색)
+- **WBS 2.4:** QA 및 테스트
+- **WBS 2.5:** 소프트 론칭 (비공개 베타 테스트)
+
+### 3단계: 지능형 기능 구현 (13-20주차)
+- **WBS 3.1:** NLP 모델 개발 V1 (규칙 기반 및 초기 훈련)
+- **WBS 3.2:** 백엔드 통합 (NLP 모델 API 연동)
+- **WBS 3.3:** 프론트엔드 통합 (AI 태그 표시 및 피드백 UI)
+- **WBS 3.4:** 분석 대시보드 V1 개발
+- **WBS 3.5:** 게임화 엔진('마음의 정원') 구현
+
+### 4단계: 공식 출시, 마케팅 및 반복 (21주차 이후)
+- **WBS 4.1:** 앱 스토어 출시
+- **WBS 4.2:** 마케팅 캠페인 실행
+- **WBS 4.3:** 수익화 기능 구현
+- **WBS 4.4:** 지속적인 데이터 분석 및 기능 반복 개선
 
 ## 트러블슈팅
 
@@ -56,5 +87,7 @@
 
 | 날짜       | 문제 상황 | 해결 과정 | 참고 링크 |
 | ---------- | --------- | --------- | --------- |
+| 2025-07-17 | Frontend/Backend CORS 오류 | FastAPI 백엔드에서 `CORSMiddleware` 설정을 수정하여 모든 출처(`allow_origins=["*"]`)를 허용하도록 변경. 중복 선언된 미들웨어를 정리하고 Docker 이미지를 재빌드하여 해결. | - |
+| 2025-07-17 | `passlib`와 `bcrypt` 버전 충돌 | `requirements.txt`에 `bcrypt==3.2.0` 버전을 명시적으로 추가하여 라이브러리 호환성 문제를 해결하고 Docker 이미지를 재빌드함. | - |
 | 2025-07-16 | 예: iOS 빌드 시 Cocoapods 버전 충돌 | `pod repo update` 후 `pod install` 재실행 | -         |
 
