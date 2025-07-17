@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
       ),
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          return auth.token != null ? DiaryListScreen() : const AuthScreen();
+          return auth.token != null ? DiaryListScreen() : AuthScreen();
         },
       ),
       routes: {

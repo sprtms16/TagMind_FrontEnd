@@ -166,7 +166,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                                 onPressed: () async {
                                   await diaryProvider.deleteDiary(diaryProvider.diaries[i].id);
                                 },
-                                color: Theme.of(context).errorColor,
+                                color: Theme.of(context).colorScheme.error,
                               ),
                             ],
                           )
