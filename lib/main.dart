@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import './providers/auth_provider.dart';
+import './screens/auth_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,9 +25,7 @@ class MyApp extends StatelessWidget {
         // Define custom color palette based on design document
         colorScheme: const ColorScheme(
           primary: Color(0xFF4C6EF5), // Calm Blue
-          primaryVariant: Color(0xFF3A5BBF), // Darker Calm Blue
           secondary: Color(0xFFADB5BD), // Soft Gray
-          secondaryVariant: Color(0xFF868E96), // Darker Soft Gray
           surface: Color(0xFFF8F9FA), // Off-White
           background: Color(0xFFF8F9FA), // Off-White
           error: Color(0xFFDC3545), // Red for errors
@@ -46,7 +52,11 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      home: const MyHomePage(),
+      home: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return auth.token != null ? const MyHomePage() : const AuthScreen();
+        },
+      ),
     );
   }
 }
