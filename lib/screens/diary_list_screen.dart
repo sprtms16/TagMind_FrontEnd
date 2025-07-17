@@ -15,6 +15,7 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _showCalendar = false; // State to toggle between calendar and list view
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -32,6 +33,16 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
       });
       // Optionally, filter diaries based on selectedDay here
     }
+  }
+
+  void _onSearchSubmitted(String query) {
+    Provider.of<DiaryProvider>(context, listen: false).searchDiaries(query);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,6 +66,24 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
             },
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search diaries...',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () => _onSearchSubmitted(_searchController.text),
+                ),
+              ),
+              onSubmitted: _onSearchSubmitted,
+            ),
+          ),
+        ),
       ),
       body: Consumer<DiaryProvider>(
         builder: (context, diaryProvider, child) {

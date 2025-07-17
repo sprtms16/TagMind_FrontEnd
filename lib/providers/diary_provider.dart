@@ -51,6 +51,7 @@ class DiaryProvider with ChangeNotifier {
           'title': diary.title,
           'content': diary.content,
           'image_url': diary.imageUrl,
+          'tags': diary.tags,
         }),
       );
 
@@ -81,6 +82,7 @@ class DiaryProvider with ChangeNotifier {
           'title': newDiary.title,
           'content': newDiary.content,
           'image_url': newDiary.imageUrl,
+          'tags': newDiary.tags,
         }),
       );
 
@@ -114,6 +116,28 @@ class DiaryProvider with ChangeNotifier {
         notifyListeners();
       } else {
         throw Exception('Failed to delete diary');
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<void> searchDiaries(String query) async {
+    final url = Uri.parse('$_baseUrl/search?query=$query');
+    final token = await _storage.read(key: 'jwt_token');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = json.decode(response.body);
+        _diaries = responseData.map((json) => Diary.fromJson(json)).toList();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to search diaries');
       }
     } catch (error) {
       rethrow;
