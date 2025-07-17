@@ -14,12 +14,14 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
+  final _tagsController = TextEditingController();
   var _editedDiary = Diary(
     id: 0,
     title: '',
     content: '',
     createdAt: DateTime.now(),
     imageUrl: null,
+    tags: [],
   );
   var _isInit = true;
   var _isLoading = false;
@@ -32,6 +34,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
         _editedDiary = Provider.of<DiaryProvider>(context, listen: false).diaries.firstWhere((diary) => diary.id == diaryId);
         _titleController.text = _editedDiary.title;
         _contentController.text = _editedDiary.content;
+        _tagsController.text = _editedDiary.tags.join(', ');
       }
     }
     _isInit = false;
@@ -42,6 +45,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
+    _tagsController.dispose();
     super.dispose();
   }
 
@@ -56,6 +60,8 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     });
 
     try {
+      final List<String> tags = _tagsController.text.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList();
+
       if (_editedDiary.id != 0) {
         await Provider.of<DiaryProvider>(context, listen: false).updateDiary(
           _editedDiary.id,
@@ -65,6 +71,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
             content: _contentController.text,
             createdAt: _editedDiary.createdAt,
             imageUrl: _editedDiary.imageUrl,
+            tags: tags,
           ),
         );
       } else {
@@ -75,6 +82,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
             content: _contentController.text,
             createdAt: DateTime.now(),
             imageUrl: null,
+            tags: tags,
           ),
         );
       }
@@ -141,6 +149,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                           content: _editedDiary.content,
                           createdAt: _editedDiary.createdAt,
                           imageUrl: _editedDiary.imageUrl,
+                          tags: _editedDiary.tags,
                         );
                       },
                     ),
@@ -165,7 +174,15 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                           content: value!,
                           createdAt: _editedDiary.createdAt,
                           imageUrl: _editedDiary.imageUrl,
+                          tags: _editedDiary.tags,
                         );
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Tags (comma-separated)'),
+                      controller: _tagsController,
+                      onSaved: (value) {
+                        // Tags are processed in _saveForm
                       },
                     ),
                   ],
