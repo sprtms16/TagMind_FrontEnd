@@ -144,4 +144,32 @@ class DiaryProvider with ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<List<String>> fetchSuggestedTags(int diaryId) async {
+    final url = Uri.parse('$_baseUrl/ai/tagging');
+    final token = await _storage.read(key: 'jwt_token');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'diary_id': diaryId}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        // Assuming the backend returns the updated diary with new tags
+        final updatedDiary = Diary.fromJson(responseData);
+        return updatedDiary.tags.map((tag) => tag.name).toList();
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['detail'] ?? 'Failed to fetch suggested tags');
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
 }

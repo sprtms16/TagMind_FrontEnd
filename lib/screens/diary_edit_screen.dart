@@ -25,6 +25,8 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   );
   var _isInit = true;
   var _isLoading = false;
+  List<String> _suggestedTags = [];
+  var _isFetchingTags = false;
 
   @override
   void didChangeDependencies() {
@@ -34,7 +36,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
         _editedDiary = Provider.of<DiaryProvider>(context, listen: false).diaries.firstWhere((diary) => diary.id == diaryId);
         _titleController.text = _editedDiary.title;
         _contentController.text = _editedDiary.content;
-        _tagsController.text = _editedDiary.tags.join(', ');
+        _tagsController.text = _editedDiary.tags.map((tag) => tag.name).join(', ');
       }
     }
     _isInit = false;
@@ -42,8 +44,53 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _contentController.addListener(_onContentChanged);
+  }
+
+  void _onContentChanged() {
+    if (_contentController.text.length > 50 && !_isFetchingTags) { // Only fetch if content is long enough and not already fetching
+      _fetchSuggestedTags();
+    }
+  }
+
+  Future<void> _fetchSuggestedTags() async {
+    if (_editedDiary.id == 0) return; // Cannot fetch tags for a new diary yet
+
+    setState(() {
+      _isFetchingTags = true;
+    });
+
+    try {
+      final diaryProvider = Provider.of<DiaryProvider>(context, listen: false);
+      final fetchedTags = await diaryProvider.fetchSuggestedTags(_editedDiary.id);
+      setState(() {
+        _suggestedTags = fetchedTags;
+      });
+    } catch (error) {
+      print('Error fetching suggested tags: $error');
+      // Optionally show a snackbar or alert
+    } finally {
+      setState(() {
+        _isFetchingTags = false;
+      });
+    }
+  }
+
+  void _addSuggestedTag(String tag) {
+    final currentTags = _tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    if (!currentTags.contains(tag)) {
+      setState(() {
+        _tagsController.text = (currentTags + [tag]).join(', ');
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
+    _contentController.removeListener(_onContentChanged);
     _contentController.dispose();
     _tagsController.dispose();
     super.dispose();
@@ -67,22 +114,26 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
           _editedDiary.id,
           Diary(
             id: _editedDiary.id,
+            userId: _editedDiary.userId, // Add userId
             title: _titleController.text,
             content: _contentController.text,
             createdAt: _editedDiary.createdAt,
+            updatedAt: DateTime.now(), // Add updatedAt
             imageUrl: _editedDiary.imageUrl,
-            tags: tags,
+            tags: tags.map((name) => Tag(id: 0, name: name)).toList(), // Convert to Tag objects
           ),
         );
       } else {
         await Provider.of<DiaryProvider>(context, listen: false).addDiary(
           Diary(
             id: 0,
+            userId: 0, // Placeholder for new diary
             title: _titleController.text,
             content: _contentController.text,
             createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
             imageUrl: null,
-            tags: tags,
+            tags: tags.map((name) => Tag(id: 0, name: name)).toList(), // Convert to Tag objects
           ),
         );
       }
@@ -145,9 +196,11 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                       onSaved: (value) {
                         _editedDiary = Diary(
                           id: _editedDiary.id,
+                          userId: _editedDiary.userId,
                           title: value!,
                           content: _editedDiary.content,
                           createdAt: _editedDiary.createdAt,
+                          updatedAt: _editedDiary.updatedAt,
                           imageUrl: _editedDiary.imageUrl,
                           tags: _editedDiary.tags,
                         );
@@ -170,14 +223,40 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                       onSaved: (value) {
                         _editedDiary = Diary(
                           id: _editedDiary.id,
+                          userId: _editedDiary.userId,
                           title: _editedDiary.title,
                           content: value!,
                           createdAt: _editedDiary.createdAt,
+                          updatedAt: _editedDiary.updatedAt,
                           imageUrl: _editedDiary.imageUrl,
                           tags: _editedDiary.tags,
                         );
                       },
                     ),
+                    // AI Suggested Tags
+                    if (_isFetchingTags)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: CircularProgressIndicator(),
+                      ) 
+                    else if (_suggestedTags.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('AI Suggested Tags:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Wrap(
+                              spacing: 8.0,
+                              children: _suggestedTags.map((tag) => Chip(
+                                label: Text(tag),
+                                onDeleted: () => _addSuggestedTag(tag), // Add on tap
+                                deleteIcon: Icon(Icons.add), // Change icon to add
+                              )).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
                     TextFormField(
                       decoration: InputDecoration(labelText: 'Tags (comma-separated)'),
                       controller: _tagsController,
