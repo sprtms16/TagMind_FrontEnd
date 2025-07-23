@@ -58,12 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: _isSearching
             ? TextField(
                 controller: _searchController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Search diaries...',
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                 ),
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 onSubmitted: _performSearch,
               )
             : const Text('TagMind'),
@@ -94,14 +94,23 @@ class _HomeScreenState extends State<HomeScreen> {
           : ListView.builder(
               itemCount: diaryProvider.diaries.length,
               itemBuilder: (ctx, i) => Card(
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                elevation: 3,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: ListTile(
-                    title: Text(diaryProvider.diaries[i].title),
-                    subtitle: Text(diaryProvider.diaries[i].content ?? 'No content'),
+                    title: Text(
+                      diaryProvider.diaries[i].title,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    subtitle: Text(
+                      diaryProvider.diaries[i].content ?? 'No content',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     trailing: IconButton(
-                      icon: const Icon(Icons.edit),
+                      icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary),
                       onPressed: () {
                         Navigator.of(context).pushNamed(
                           DiaryEditScreen.routeName,

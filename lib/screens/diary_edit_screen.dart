@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/diary_provider.dart';
+import '../providers/tag_provider.dart';
 import '../models/diary.dart';
+import '../models/tag.dart';
 
 class DiaryEditScreen extends StatefulWidget {
   static const routeName = '/edit-diary';
@@ -13,20 +15,19 @@ class DiaryEditScreen extends StatefulWidget {
 class _DiaryEditScreenState extends State<DiaryEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
-  final _tagsController = TextEditingController();
   var _editedDiary = Diary(
     id: 0,
+    userId: 0,
     title: '',
-    content: '',
+    content: '', // Content will be derived from tags or deprecated
     createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
     imageUrl: null,
     tags: [],
   );
   var _isInit = true;
   var _isLoading = false;
-  List<String> _suggestedTags = [];
-  var _isFetchingTags = false;
+  List<Tag> _selectedTags = [];
 
   @override
   void didChangeDependencies() {
@@ -35,64 +36,18 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
       if (diaryId != null) {
         _editedDiary = Provider.of<DiaryProvider>(context, listen: false).diaries.firstWhere((diary) => diary.id == diaryId);
         _titleController.text = _editedDiary.title;
-        _contentController.text = _editedDiary.content;
-        _tagsController.text = _editedDiary.tags.map((tag) => tag.name).join(', ');
+        _selectedTags = _editedDiary.tags;
       }
+      // Fetch available tags
+      // Provider.of<TagProvider>(context, listen: false).fetchTags();
     }
     _isInit = false;
     super.didChangeDependencies();
   }
 
   @override
-  void initState() {
-    super.initState();
-    _contentController.addListener(_onContentChanged);
-  }
-
-  void _onContentChanged() {
-    if (_contentController.text.length > 50 && !_isFetchingTags) { // Only fetch if content is long enough and not already fetching
-      _fetchSuggestedTags();
-    }
-  }
-
-  Future<void> _fetchSuggestedTags() async {
-    if (_editedDiary.id == 0) return; // Cannot fetch tags for a new diary yet
-
-    setState(() {
-      _isFetchingTags = true;
-    });
-
-    try {
-      final diaryProvider = Provider.of<DiaryProvider>(context, listen: false);
-      final fetchedTags = await diaryProvider.fetchSuggestedTags(_editedDiary.id);
-      setState(() {
-        _suggestedTags = fetchedTags;
-      });
-    } catch (error) {
-      print('Error fetching suggested tags: $error');
-      // Optionally show a snackbar or alert
-    } finally {
-      setState(() {
-        _isFetchingTags = false;
-      });
-    }
-  }
-
-  void _addSuggestedTag(String tag) {
-    final currentTags = _tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    if (!currentTags.contains(tag)) {
-      setState(() {
-        _tagsController.text = (currentTags + [tag]).join(', ');
-      });
-    }
-  }
-
-  @override
   void dispose() {
     _titleController.dispose();
-    _contentController.removeListener(_onContentChanged);
-    _contentController.dispose();
-    _tagsController.dispose();
     super.dispose();
   }
 
@@ -107,35 +62,21 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     });
 
     try {
-      final List<String> tags = _tagsController.text.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList();
+      final diaryToSave = Diary(
+        id: _editedDiary.id,
+        userId: _editedDiary.userId,
+        title: _titleController.text,
+        content: _selectedTags.map((t) => t.name).join(', '), // Create content from tags
+        createdAt: _editedDiary.id != 0 ? _editedDiary.createdAt : DateTime.now(),
+        updatedAt: DateTime.now(),
+        imageUrl: _editedDiary.imageUrl,
+        tags: _selectedTags,
+      );
 
       if (_editedDiary.id != 0) {
-        await Provider.of<DiaryProvider>(context, listen: false).updateDiary(
-          _editedDiary.id,
-          Diary(
-            id: _editedDiary.id,
-            userId: _editedDiary.userId, // Add userId
-            title: _titleController.text,
-            content: _contentController.text,
-            createdAt: _editedDiary.createdAt,
-            updatedAt: DateTime.now(), // Add updatedAt
-            imageUrl: _editedDiary.imageUrl,
-            tags: tags.map((name) => Tag(id: 0, name: name)).toList(), // Convert to Tag objects
-          ),
-        );
+        await Provider.of<DiaryProvider>(context, listen: false).updateDiary(_editedDiary.id, diaryToSave);
       } else {
-        await Provider.of<DiaryProvider>(context, listen: false).addDiary(
-          Diary(
-            id: 0,
-            userId: 0, // Placeholder for new diary
-            title: _titleController.text,
-            content: _contentController.text,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            imageUrl: null,
-            tags: tags.map((name) => Tag(id: 0, name: name)).toList(), // Convert to Tag objects
-          ),
-        );
+        await Provider.of<DiaryProvider>(context, listen: false).addDiary(diaryToSave);
       }
     } catch (error) {
       await showDialog<void>(
@@ -163,6 +104,10 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Dummy Data for Tags - Replace with Provider data
+    final allTags = Provider.of<TagProvider>(context).tags;
+    final groupedTags = _groupTagsByCategory(allTags);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Diary'),
@@ -174,14 +119,12 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
+          ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
-                child: ListView(
+                child: Column(
                   children: <Widget>[
                     TextFormField(
                       decoration: InputDecoration(labelText: 'Title'),
@@ -193,81 +136,83 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                         }
                         return null;
                       },
-                      onSaved: (value) {
-                        _editedDiary = Diary(
-                          id: _editedDiary.id,
-                          userId: _editedDiary.userId,
-                          title: value!,
-                          content: _editedDiary.content,
-                          createdAt: _editedDiary.createdAt,
-                          updatedAt: _editedDiary.updatedAt,
-                          imageUrl: _editedDiary.imageUrl,
-                          tags: _editedDiary.tags,
-                        );
-                      },
                     ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Content'),
-                      maxLines: 10,
-                      keyboardType: TextInputType.multiline,
-                      controller: _contentController,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter some content.';
-                        }
-                        if (value.length < 10) {
-                          return 'Should be at least 10 characters long.';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _editedDiary = Diary(
-                          id: _editedDiary.id,
-                          userId: _editedDiary.userId,
-                          title: _editedDiary.title,
-                          content: value!,
-                          createdAt: _editedDiary.createdAt,
-                          updatedAt: _editedDiary.updatedAt,
-                          imageUrl: _editedDiary.imageUrl,
-                          tags: _editedDiary.tags,
-                        );
-                      },
-                    ),
-                    // AI Suggested Tags
-                    if (_isFetchingTags)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10.0),
-                        child: CircularProgressIndicator(),
-                      ) 
-                    else if (_suggestedTags.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('AI Suggested Tags:', style: TextStyle(fontWeight: FontWeight.bold)),
-                            Wrap(
-                              spacing: 8.0,
-                              children: _suggestedTags.map((tag) => Chip(
-                                label: Text(tag),
-                                onDeleted: () => _addSuggestedTag(tag), // Add on tap
-                                deleteIcon: Icon(Icons.add), // Change icon to add
-                              )).toList(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Tags (comma-separated)'),
-                      controller: _tagsController,
-                      onSaved: (value) {
-                        // Tags are processed in _saveForm
-                      },
+                    SizedBox(height: 16),
+                    Expanded(
+                      child: _buildTagSelection(groupedTags),
                     ),
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  Map<String, List<Tag>> _groupTagsByCategory(List<Tag> tags) {
+    final Map<String, List<Tag>> grouped = {};
+    for (var tag in tags) {
+      if (!grouped.containsKey(tag.category)) {
+        grouped[tag.category] = [];
+      }
+      grouped[tag.category]!.add(tag);
+    }
+    return grouped;
+  }
+
+  Widget _buildTagSelection(Map<String, List<Tag>> groupedTags) {
+    if (groupedTags.isEmpty) {
+      return Center(
+        child: Text('No tags available. Go to the Tag Store to get more!'),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: groupedTags.keys.length,
+      itemBuilder: (context, index) {
+        String category = groupedTags.keys.elementAt(index);
+        List<Tag> tags = groupedTags[category]!;
+
+        return ExpansionTile(
+          title: Text(category, style: Theme.of(context).textTheme.headlineMedium),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: tags.map((tag) {
+                  final isSelected = _selectedTags.any((selected) => selected.id == tag.id);
+                  return FilterChip(
+                    label: Text(tag.name),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedTags.add(tag);
+                        } else {
+                          _selectedTags.removeWhere((t) => t.id == tag.id);
+                        }
+                      });
+                    },
+                    selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    checkmarkColor: Colors.white,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                      ),
+                    ),
+                  );
+                }).toList().cast<Widget>(), // Add .cast<Widget>() here
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
