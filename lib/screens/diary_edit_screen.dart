@@ -5,6 +5,7 @@ import '../providers/tag_provider.dart';
 import '../models/diary.dart';
 import '../models/tag.dart';
 
+// DiaryEditScreen allows users to create or edit diary entries.
 class DiaryEditScreen extends StatefulWidget {
   static const routeName = '/edit-diary';
 
@@ -13,8 +14,8 @@ class DiaryEditScreen extends StatefulWidget {
 }
 
 class _DiaryEditScreenState extends State<DiaryEditScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // GlobalKey for form validation
+  final _titleController = TextEditingController(); // Controller for diary title input
   var _editedDiary = Diary(
     id: 0,
     userId: 0,
@@ -24,61 +25,75 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     updatedAt: DateTime.now(),
     imageUrl: null,
     tags: [],
-  );
-  var _isInit = true;
-  var _isLoading = false;
-  List<Tag> _selectedTags = [];
+  ); // Stores the diary data being edited or created
+  var _isInit = true; // Flag to control initial data loading
+  var _isLoading = false; // Controls loading indicator visibility
+  List<Tag> _selectedTags = []; // List of tags selected for the current diary
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
+      // Check if a diary ID is passed as an argument (for editing existing diary)
       final diaryId = ModalRoute.of(context)!.settings.arguments as int?;
       if (diaryId != null) {
-        _editedDiary = Provider.of<DiaryProvider>(context, listen: false).diaries.firstWhere((diary) => diary.id == diaryId);
+        // Load existing diary data if ID is provided
+        _editedDiary = Provider.of<DiaryProvider>(context, listen: false)
+            .diaries
+            .firstWhere((diary) => diary.id == diaryId);
         _titleController.text = _editedDiary.title;
-        _selectedTags = _editedDiary.tags;
+        _selectedTags = _editedDiary.tags; // Pre-select tags of the existing diary
       }
-      // Fetch available tags
+      // Fetch available tags (commented out as it's usually done once at app startup)
       // Provider.of<TagProvider>(context, listen: false).fetchTags();
     }
-    _isInit = false;
+    _isInit = false; // Set flag to false after initial load
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
+    _titleController.dispose(); // Dispose controller to prevent memory leaks
     super.dispose();
   }
 
+  // Handles saving the diary entry (create or update).
   Future<void> _saveForm() async {
-    final isValid = _formKey.currentState!.validate();
+    final isValid = _formKey.currentState!.validate(); // Validate form fields
     if (!isValid) {
-      return;
+      return; // If form is not valid, do not proceed
     }
-    _formKey.currentState!.save();
+    _formKey.currentState!.save(); // Save form field values
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show loading indicator
     });
 
     try {
+      // Create a Diary object with current form data
       final diaryToSave = Diary(
         id: _editedDiary.id,
-        userId: _editedDiary.userId,
+        userId: _editedDiary.userId, // User ID is typically handled by backend authentication
         title: _titleController.text,
-        content: _selectedTags.map((t) => t.name).join(', '), // Create content from tags
-        createdAt: _editedDiary.id != 0 ? _editedDiary.createdAt : DateTime.now(),
-        updatedAt: DateTime.now(),
+        content: _selectedTags
+            .map((t) => t.name)
+            .join(', '), // Generate content from selected tag names
+        createdAt:
+            _editedDiary.id != 0 ? _editedDiary.createdAt : DateTime.now(), // Preserve creation date for existing diaries
+        updatedAt: DateTime.now(), // Update timestamp to current time
         imageUrl: _editedDiary.imageUrl,
-        tags: _selectedTags,
+        tags: _selectedTags, // Pass selected Tag objects
       );
 
       if (_editedDiary.id != 0) {
-        await Provider.of<DiaryProvider>(context, listen: false).updateDiary(_editedDiary.id, diaryToSave);
+        // If editing an existing diary, call updateDiary
+        await Provider.of<DiaryProvider>(context, listen: false)
+            .updateDiary(_editedDiary.id, diaryToSave);
       } else {
-        await Provider.of<DiaryProvider>(context, listen: false).addDiary(diaryToSave);
+        // If creating a new diary, call addDiary
+        await Provider.of<DiaryProvider>(context, listen: false)
+            .addDiary(diaryToSave);
       }
     } catch (error) {
+      // Show error dialog if saving fails
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -97,39 +112,41 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     }
 
     setState(() {
-      _isLoading = false;
+      _isLoading = false; // Hide loading indicator
     });
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(); // Navigate back after saving
   }
 
   @override
   Widget build(BuildContext context) {
-    // Dummy Data for Tags - Replace with Provider data
+    // Get all available tags from TagProvider
     final allTags = Provider.of<TagProvider>(context).tags;
+    // Group tags by category for display
     final groupedTags = _groupTagsByCategory(allTags);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Diary'),
+        title: Text('Edit Diary'), // AppBar title
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveForm,
+            icon: Icon(Icons.save), // Save icon button
+            onPressed: _saveForm, // Call save function on press
           ),
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator()) // Show loading indicator
           : Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0), // Padding for the form
               child: Form(
-                key: _formKey,
+                key: _formKey, // Assign form key
                 child: Column(
                   children: <Widget>[
+                    // Title input field
                     TextFormField(
                       decoration: InputDecoration(labelText: 'Title'),
-                      textInputAction: TextInputAction.next,
-                      controller: _titleController,
+                      textInputAction: TextInputAction.next, // Move to next field on enter
+                      controller: _titleController, // Controller for title input
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Please provide a title.';
@@ -137,9 +154,10 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 16), // Spacer
+                    // Expanded widget to take available space for tag selection
                     Expanded(
-                      child: _buildTagSelection(groupedTags),
+                      child: _buildTagSelection(groupedTags), // Build tag selection UI
                     ),
                   ],
                 ),
@@ -148,6 +166,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     );
   }
 
+  // Helper function to group tags by category
   Map<String, List<Tag>> _groupTagsByCategory(List<Tag> tags) {
     final Map<String, List<Tag>> grouped = {};
     for (var tag in tags) {
@@ -159,6 +178,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     return grouped;
   }
 
+  // Builds the tag selection UI using ExpansionTile and FilterChip
   Widget _buildTagSelection(Map<String, List<Tag>> groupedTags) {
     if (groupedTags.isEmpty) {
       return Center(
@@ -173,41 +193,56 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
         List<Tag> tags = groupedTags[category]!;
 
         return ExpansionTile(
-          title: Text(category, style: Theme.of(context).textTheme.headlineMedium),
+          title:
+              Text(category, style: Theme.of(context).textTheme.headlineMedium), // Category title
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0), // Padding for chips
               child: Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: tags.map((tag) {
-                  final isSelected = _selectedTags.any((selected) => selected.id == tag.id);
-                  return FilterChip(
-                    label: Text(tag.name),
-                    selected: isSelected,
-                    showCheckmark: false,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedTags.add(tag);
-                        } else {
-                          _selectedTags.removeWhere((t) => t.id == tag.id);
-                        }
-                      });
-                    },
-                    selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                    checkmarkColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-                      ),
-                    ),
-                  );
-                }).toList().cast<Widget>(), // Add .cast<Widget>() here
+                spacing: 8.0, // Horizontal spacing between chips
+                runSpacing: 4.0, // Vertical spacing between chip rows
+                children: tags
+                    .map((tag) {
+                      final isSelected = _selectedTags
+                          .any((selected) => selected.id == tag.id); // Check if tag is selected
+                      return FilterChip(
+                        label: Text(tag.name), // Tag name as label
+                        selected: isSelected, // Selection state
+                        showCheckmark: false, // Hide default checkmark
+                        onSelected: (bool selected) {
+                          setState(() {
+                            if (selected) {
+                              _selectedTags.add(tag); // Add tag if selected
+                            } else {
+                              _selectedTags.removeWhere((t) => t.id == tag.id); // Remove tag if unselected
+                            }
+                          });
+                        },
+                        selectedColor: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.8), // Color when selected
+                        checkmarkColor: Colors.white, // Checkmark color (even if hidden, good practice)
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : Theme.of(context).colorScheme.onSurface, // Label color based on selection
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20), // Rounded corners for chip
+                          side: BorderSide(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .secondary
+                                    .withOpacity(0.5), // Border color based on selection
+                          ),
+                        ),
+                      );
+                    })
+                    .toList()
+                    .cast<Widget>(), // Convert to List<Widget>
               ),
             ),
           ],
