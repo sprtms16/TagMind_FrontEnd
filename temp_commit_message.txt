@@ -1,0 +1,1 @@
+docs(git): Remove temporary commit message file for frontend README.md
