@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: Theme.of(context).textTheme.headlineMedium, // Title style
                           ),
                           subtitle: Text(
-                            diaryProvider.diaries[i].content ?? 'No content',
+                            diaryProvider.diaries[i].content,
                             style: Theme.of(context).textTheme.bodyMedium, // Subtitle style
                           ),
                           contentPadding: const EdgeInsets.symmetric(
