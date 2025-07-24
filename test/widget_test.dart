@@ -80,6 +80,7 @@ void main() {
 
       // Verify login method was called
       verify(mockAuthProvider.login('test@example.com', 'password123')).called(1);
+    });
 
     testWidgets('Signup with valid credentials', (tester) async {
       await tester.pumpWidget(createAuthScreen());

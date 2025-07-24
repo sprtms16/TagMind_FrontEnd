@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.store),
             onPressed: () {
-              Navigator.of(context).pushNamed('/tag-store'); // Navigate to tag store screen
+              Navigator.of(context).pushNamed(TagStoreScreen.routeName); // Navigate to tag store screen
             },
           ),
         ],
