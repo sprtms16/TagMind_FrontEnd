@@ -13,6 +13,8 @@ import './screens/home_screen.dart';
 import './screens/diary_edit_screen.dart';
 import './screens/tag_store_screen.dart';
 
+const Color kPrimaryColor = Color(0xFF2196F3);
+
 void main() {
   // Run the application with MultiProvider for state management
   runApp(
@@ -53,7 +55,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity, // Adapts density based on platform
         // Define the color scheme for the application
         colorScheme: const ColorScheme(
-          primary: Color(0xFF2196F3), // A vibrant blue for primary elements
+          primary: kPrimaryColor, // A vibrant blue for primary elements
           secondary: Color(0xFF42A5F5), // A lighter blue for secondary elements
           surface: Color(0xFFFFFFFF), // White for surfaces like cards and sheets
           background: Color(0xFFF5F5F5), // Light gray for general background
@@ -82,19 +84,19 @@ class MyApp extends StatelessWidget {
         ),
         // Define the theme for the AppBar
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF2196F3), // Use primary color for AppBar background
+          backgroundColor: kPrimaryColor, // Use primary color for AppBar background
           foregroundColor: Colors.white, // White text/icons on AppBar
           elevation: 4, // Add a subtle shadow to the AppBar
         ),
         // Define the theme for Floating Action Buttons
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFF2196F3),
+          backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
         ),
         // Define the theme for Elevated Buttons
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2196F3),
+            backgroundColor: kPrimaryColor,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

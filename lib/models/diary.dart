@@ -17,10 +17,10 @@ class Diary {
     required this.userId,
     required this.title,
     required this.content,
-    this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
     required this.tags,
+    this.imageUrl,
   });
 
   // Factory constructor to create a Diary object from a JSON map.
