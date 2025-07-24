@@ -1,3 +1,4 @@
-refactor(frontend): Address PR feedback for frontend (round 7)
+refactor(frontend): Address PR feedback for frontend (round 8)
 
-All previous feedback has been addressed and implemented.
+- Added a setter for the 'diaries' list in DiaryProvider to ensure proper state management.
+- Updated HomeScreen to use the new setter for updating the displayed diaries, resolving the critical issue of direct assignment to a getter.

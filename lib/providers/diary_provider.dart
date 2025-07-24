@@ -17,6 +17,11 @@ class DiaryProvider with ChangeNotifier {
     return [..._diaries];
   }
 
+  set diaries(List<Diary> newDiaries) {
+    _diaries = newDiaries;
+    notifyListeners();
+  }
+
   List<Diary> get allDiaries {
     return [..._allDiaries];
   }

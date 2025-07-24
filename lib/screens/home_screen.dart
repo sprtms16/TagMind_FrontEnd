@@ -29,10 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<DiaryProvider>(context, listen: false).fetchDiaries().then((_) {
       _selectedDay = DateTime.now();
       // Filter diaries for the selected day from the fetched allDiaries
-      Provider.of<DiaryProvider>(context, listen: false).diaries = 
+      Provider.of<DiaryProvider>(context, listen: false).setDiaries(
           Provider.of<DiaryProvider>(context, listen: false).allDiaries
               .where((diary) => isSameDay(diary.createdAt, _selectedDay!))
-              .toList();
+              .toList());
     });
   }
 
