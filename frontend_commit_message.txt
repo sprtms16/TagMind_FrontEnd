@@ -1,5 +1,4 @@
-feat: Implement image upload in frontend addDiary function
+refactor(frontend): Address PR feedback for frontend (round 8)
 
-- Modified `addDiary` to use `MultipartRequest` for image uploads.
-- Added `imageFile` as an optional parameter to `addDiary`.
-- Ensured `title`, `content`, and `tags` are sent as fields in the multipart request.
+- Added a setter for the 'diaries' list in DiaryProvider to ensure proper state management.
+- Updated HomeScreen to use the new setter for updating the displayed diaries, resolving the critical issue of direct assignment to a getter.
