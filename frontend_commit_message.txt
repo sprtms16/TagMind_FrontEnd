@@ -1,5 +1,6 @@
-feat: Implement image upload in frontend addDiary function
+refactor(frontend): Address PR feedback for frontend (round 4)
 
-- Modified `addDiary` to use `MultipartRequest` for image uploads.
-- Added `imageFile` as an optional parameter to `addDiary`.
-- Ensured `title`, `content`, and `tags` are sent as fields in the multipart request.
+- **lib/models/diary.dart**: Simplified tag list parsing logic using null-aware operators.
+- **lib/screens/home_screen.dart**: Removed unnecessary null-coalescing operator for `Diary.content`.
+- **lib/main.dart**: Defined primary color as a constant (`kPrimaryColor`) and reused it throughout `ThemeData` for better maintainability.
+- **lib/screens/diary_edit_screen.dart**: Added validation to `_saveForm` to ensure at least one tag is selected before saving, preventing diaries with empty content.

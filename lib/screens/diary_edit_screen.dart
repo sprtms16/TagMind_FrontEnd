@@ -62,6 +62,13 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
     if (!isValid) {
       return; // If form is not valid, do not proceed
     }
+
+    if (_selectedTags.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select at least one tag.')),
+      );
+      return;
+    }
     _formKey.currentState!.save(); // Save form field values
     setState(() {
       _isLoading = true; // Show loading indicator
