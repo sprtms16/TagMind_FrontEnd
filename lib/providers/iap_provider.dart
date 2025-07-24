@@ -62,6 +62,7 @@ class IapProvider with ChangeNotifier {
         // For simplicity, assume any successful purchase makes user premium.
         // In a real app, you'd check specific product IDs or user entitlements.
         _isPremium = true; // This should be more granular based on purchased packs
+        // TODO: Backend should return user's current entitlements after purchase for a more robust solution.
         notifyListeners(); // Notify listeners about state change
         return true;
       } else {

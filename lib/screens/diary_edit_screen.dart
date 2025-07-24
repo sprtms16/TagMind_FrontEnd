@@ -176,7 +176,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   }
 
   // Helper function to group tags by category
-  Map<String, List<Tag>> _groupTagsByCategory(List<Tag> tags) {
+  static Map<String, List<Tag>> _groupTagsByCategory(List<Tag> tags) {
     final Map<String, List<Tag>> grouped = {};
     for (var tag in tags) {
       if (!grouped.containsKey(tag.category)) {
@@ -250,8 +250,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
                         ),
                       );
                     })
-                    .toList()
-                    .cast<Widget>(), // Convert to List<Widget>
+                    .toList(), // Convert to List<Widget>
               ),
             ),
           ],

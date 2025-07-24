@@ -1,5 +1,6 @@
-refactor(frontend): Address PR feedback for frontend (round 5)
+refactor(frontend): Address PR feedback for frontend (round 6)
 
-- **test/widget_test.dart**: Added missing closing `});` for `Signup with valid credentials` test block.
-- **lib/screens/diary_edit_screen.dart**: Added `if (!mounted) return;` checks before `await showDialog` and `setState` calls in `_saveForm` method to prevent errors if the widget is disposed.
-- **lib/screens/tag_store_screen.dart**: Added `if (!mounted) return;` checks before `ScaffoldMessenger` calls after `purchaseTagPack` and in the `catch` block to prevent errors if the widget is disposed.
+- **test/widget_test.dart**: Removed unnecessary blank lines for improved readability.
+- **lib/screens/home_screen.dart**: Optimized `initState` to reduce network calls by fetching all diaries once and filtering locally. Also improved `TextField` contrast in `AppBar` by using `onPrimary` color.
+- **lib/providers/iap_provider.dart**: Added a TODO comment to `purchaseTagPack` regarding more robust premium status handling from the backend.
+- **lib/screens/diary_edit_screen.dart**: Made `_groupTagsByCategory` static for better code organization and removed redundant `.cast<Widget>()` call.

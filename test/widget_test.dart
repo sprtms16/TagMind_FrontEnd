@@ -66,10 +66,6 @@ void main() {
     testWidgets('Login with valid credentials', (tester) async {
       await tester.pumpWidget(createAuthScreen());
 
-
-
-
-
       // Enter email and password
       await tester.enterText(find.byKey(ValueKey('email')), 'test@example.com');
       await tester.enterText(find.byKey(ValueKey('password')), 'password123');
@@ -88,10 +84,6 @@ void main() {
       // Switch to signup mode
       await tester.tap(find.text('Create new account'));
       await tester.pump();
-
-
-
-
 
       // Enter details
       await tester.enterText(find.byKey(ValueKey('nickname')), 'newuser');

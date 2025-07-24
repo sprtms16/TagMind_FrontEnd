@@ -25,13 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Fetch tags when the screen initializes
     Provider.of<TagProvider>(context, listen: false).fetchTags();
-    // Fetch diaries for today's date initially to populate the list
-    _selectedDay = DateTime.now();
-    Provider.of<DiaryProvider>(context, listen: false)
-        .fetchDiariesByDate(_selectedDay!); // Initial load for today's diaries
-    // Fetch all diaries for calendar events (dots on calendar)
-    Provider.of<DiaryProvider>(context, listen: false)
-        .fetchDiaries(); // Fetch all diaries for calendar events
+    // Fetch all diaries for calendar events and initial display
+    Provider.of<DiaryProvider>(context, listen: false).fetchDiaries().then((_) {
+      _selectedDay = DateTime.now();
+      // Filter diaries for the selected day from the fetched allDiaries
+      Provider.of<DiaryProvider>(context, listen: false).diaries = 
+          Provider.of<DiaryProvider>(context, listen: false).allDiaries
+              .where((diary) => isSameDay(diary.createdAt, _selectedDay!))
+              .toList();
+    });
   }
 
   @override
@@ -120,11 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   hintStyle: TextStyle(
                       color: Theme.of(context)
                           .colorScheme
-                          .onSurface
+                          .onPrimary
                           .withOpacity(0.7)), // Hint text style
                 ),
                 style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface), // Input text style
+                    TextStyle(color: Theme.of(context).colorScheme.onPrimary), // Input text style
                 onSubmitted: _performSearch, // Callback when search is submitted
               )
             : const Text('TagMind'), // App title when not searching
