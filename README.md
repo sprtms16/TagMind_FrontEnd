@@ -10,6 +10,7 @@
 
 - [주요 기능](#주요-기능)
 - [기술 스택](#기술-스택)
+- [주요 변경 사항](#주요-변경-사항)
 - [프로젝트 설정 및 실행](#프로젝트-설정-및-실행)
 - [개발 로드맵](#개발-로드맵)
 - [트러블슈팅](#트러블슈팅)
@@ -30,9 +31,34 @@ TagMind는 단순한 일기장을 넘어, 사용자의 삶을 더 깊이 이해�
 
 - **Framework:** Flutter
 - **State Management:** Provider
-- **HTTP Client:** Dio
+- **HTTP Client:** http (Note: Dio was previously listed but http is currently used)
 - **Storage:** flutter_secure_storage (인증 토큰), shared_preferences (사용자 설정)
 - **Linting:** lint
+- **Testing:** flutter_test, mockito
+
+## 주요 변경 사항
+
+최근 업데이트를 통해 다음과 같은 개선 사항이 적용되었습니다:
+
+- **테스트 코드 개선**:
+    - `testWidgets` 중첩 오류를 수정하여 테스트 스위트가 올바르게 실행되도록 했습니다.
+    - `mockito` 사용법을 개선하고 불필요한 빈 줄을 제거하여 테스트 코드의 가독성과 간결성을 높였습니다.
+- **UI/UX 개선**:
+    - `Diary` 모델 생성자의 매개변수 순서를 Dart 컨벤션에 맞게 재정렬하여 가독성을 높였습니다.
+    - `TagStoreScreen.routeName` 정적 상수를 사용하여 하드코딩된 라우트 이름을 대체하고 유지보수성을 향상시켰습니다.
+    - `AppBar` 내 `TextField`의 텍스트 및 힌트 스타일 색상을 `AppBar` 배경과 대비가 좋도록 변경하여 가독성을 개선했습니다.
+    - `ThemeData` 정의 내에 하드코딩된 색상 값을 상수로 정의하고 재사용하여 테마 관리의 용이성을 높였습니다.
+- **상태 관리 및 성능 최적화**:
+    - `DiaryProvider`의 `diaries` getter에 대한 setter를 추가하여 `_diaries` 리스트의 일관성 없는 직접 할당 문제를 해결하고 적절한 상태 관리를 보장했습니다.
+    - `initState`에서 불필요한 네트워크 호출을 제거하고, `_allDiaries`에서 로컬 필터링을 통해 데이터를 가져오도록 최적화하여 앱 시작 시 네트워크 부하를 줄이고 성능을 향상시켰습니다.
+    - `diary_edit_screen.dart` 및 `tag_store_screen.dart`에서 `if (!mounted) return;` 검사를 추가하여 비동기 작업 후 위젯이 dispose될 경우 발생할 수 있는 런타임 오류를 방지했습니다.
+- **코드 품질 향상**:
+    - `_groupTagsByCategory` 메서드를 `static`으로 변경하여 코드 구성 및 테스트 용이성을 개선했습니다.
+    - 불필요한 `.cast<Widget>()` 호출을 제거하여 코드를 간결하게 만들었습니다.
+    - `Diary` 모델의 `content` 속성이 non-nullable이므로 `home_screen.dart`에서 `?? 'No content'`와 같은 불필요한 null-coalescing 연산자를 제거했습니다.
+    - `image_picker` 의존성을 제거했습니다.
+    - `print()` 문을 `debugPrint()`로 대체했습니다.
+- **유효성 검사 추가**: `diary_edit_screen.dart`에서 일기 저장 전 최소 하나의 태그가 선택되었는지 확인하는 유효성 검사를 추가했습니다.
 
 ## 프로젝트 설정 및 실행
 
@@ -90,4 +116,4 @@ TagMind는 단순한 일기장을 넘어, 사용자의 삶을 더 깊이 이해�
 | 2025-07-17 | Frontend/Backend CORS 오류 | FastAPI 백엔드에서 `CORSMiddleware` 설정을 수정하여 모든 출처(`allow_origins=["*"]`)를 허용하도록 변경. 중복 선언된 미들웨어를 정리하고 Docker 이미지를 재빌드하여 해결. | - |
 | 2025-07-17 | `passlib`와 `bcrypt` 버전 충돌 | `requirements.txt`에 `bcrypt==3.2.0` 버전을 명시적으로 추가하여 라이브러리 호환성 문제를 해결하고 Docker 이미지를 재빌드함. | - |
 | 2025-07-16 | 예: iOS 빌드 시 Cocoapods 버전 충돌 | `pod repo update` 후 `pod install` 재실행 | -         |
-
+| 2025-07-24 | `DiaryProvider`의 `diaries` getter에 직접 할당 시 런타임 오류 | `DiaryProvider`에 `setDiaries` setter를 추가하고, `HomeScreen`에서 해당 setter를 사용하여 `_diaries` 리스트를 업데이트하도록 수정. | - |
