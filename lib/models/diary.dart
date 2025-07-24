@@ -26,10 +26,7 @@ class Diary {
   // Factory constructor to create a Diary object from a JSON map.
   factory Diary.fromJson(Map<String, dynamic> json) {
     // Safely parse the 'tags' field, handling null or empty lists.
-    var tagsFromJson = json['tags'];
-    List<Tag> tagList = tagsFromJson != null
-        ? (tagsFromJson as List).map((i) => Tag.fromJson(i)).toList()
-        : [];
+    List<Tag> tagList = (tagsFromJson as List<dynamic>? ?? []).map((i) => Tag.fromJson(i)).toList();
 
     return Diary(
       id: json['id'],

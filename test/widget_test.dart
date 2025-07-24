@@ -78,8 +78,8 @@ void main() {
       await tester.tap(find.text('Login'));
       await tester.pump();
 
-
-    });
+      // Verify login method was called
+      verify(mockAuthProvider.login('test@example.com', 'password123')).called(1);
 
     testWidgets('Signup with valid credentials', (tester) async {
       await tester.pumpWidget(createAuthScreen());
@@ -101,8 +101,8 @@ void main() {
       await tester.tap(find.text('Signup'));
       await tester.pump();
 
-
-    });
+      // Verify signup method was called
+      verify(mockAuthProvider.signup('new@example.com', 'newpassword', 'newuser')).called(1);
 
     testWidgets('Login with invalid email shows error', (tester) async {
       await tester.pumpWidget(createAuthScreen());

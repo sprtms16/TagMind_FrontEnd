@@ -87,14 +87,14 @@ class MyApp extends StatelessWidget {
           elevation: 4, // Add a subtle shadow to the AppBar
         ),
         // Define the theme for Floating Action Buttons
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Theme.of(context).colorScheme.primary,
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF2196F3),
           foregroundColor: Colors.white,
         ),
         // Define the theme for Elevated Buttons
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: const Color(0xFF2196F3),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

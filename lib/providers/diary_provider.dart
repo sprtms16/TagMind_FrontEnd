@@ -137,7 +137,7 @@ class DiaryProvider with ChangeNotifier {
         }
         notifyListeners(); // Notify listeners about state change
       } else {
-        print('Failed to add diary: ${response.statusCode} ${response.body}');
+        debugPrint('Failed to add diary: ${response.statusCode} ${response.body}');
         throw Exception('Failed to add diary');
       }
     } catch (error) {
