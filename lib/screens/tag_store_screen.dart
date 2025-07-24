@@ -61,6 +61,7 @@ class _TagStoreScreenState extends State<TagStoreScreen> {
                                 // Attempt to purchase the tag pack
                                 final success = await iapProvider
                                     .purchaseTagPack(tagPack.productId);
+                                if (!mounted) return;
                                 if (success) {
                                   // Show success message
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -84,6 +85,7 @@ class _TagStoreScreenState extends State<TagStoreScreen> {
                                       .toString()
                                       .replaceFirst('Exception: ', '');
                                 }
+                                if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content: Text('Error: ${errorMessage}')),

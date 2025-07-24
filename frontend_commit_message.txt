@@ -1,6 +1,5 @@
-refactor(frontend): Address PR feedback for frontend (round 4)
+refactor(frontend): Address PR feedback for frontend (round 5)
 
-- **lib/models/diary.dart**: Simplified tag list parsing logic using null-aware operators.
-- **lib/screens/home_screen.dart**: Removed unnecessary null-coalescing operator for `Diary.content`.
-- **lib/main.dart**: Defined primary color as a constant (`kPrimaryColor`) and reused it throughout `ThemeData` for better maintainability.
-- **lib/screens/diary_edit_screen.dart**: Added validation to `_saveForm` to ensure at least one tag is selected before saving, preventing diaries with empty content.
+- **test/widget_test.dart**: Added missing closing `});` for `Signup with valid credentials` test block.
+- **lib/screens/diary_edit_screen.dart**: Added `if (!mounted) return;` checks before `await showDialog` and `setState` calls in `_saveForm` method to prevent errors if the widget is disposed.
+- **lib/screens/tag_store_screen.dart**: Added `if (!mounted) return;` checks before `ScaffoldMessenger` calls after `purchaseTagPack` and in the `catch` block to prevent errors if the widget is disposed.

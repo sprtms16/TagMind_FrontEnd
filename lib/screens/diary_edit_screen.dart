@@ -70,6 +70,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
       return;
     }
     _formKey.currentState!.save(); // Save form field values
+    if (!mounted) return;
     setState(() {
       _isLoading = true; // Show loading indicator
     });
@@ -101,6 +102,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
       }
     } catch (error) {
       // Show error dialog if saving fails
+      if (!mounted) return;
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(

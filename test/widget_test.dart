@@ -104,6 +104,7 @@ void main() {
 
       // Verify signup method was called
       verify(mockAuthProvider.signup('new@example.com', 'newpassword', 'newuser')).called(1);
+    });
 
     testWidgets('Login with invalid email shows error', (tester) async {
       await tester.pumpWidget(createAuthScreen());
