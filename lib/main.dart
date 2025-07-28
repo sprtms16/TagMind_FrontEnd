@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart'; // Firebase Core import
+import 'firebase_options.dart'; // Firebase Options import
 
 // Import application providers
 import './providers/auth_provider.dart';
@@ -15,7 +17,12 @@ import './screens/tag_store_screen.dart';
 
 const Color kPrimaryColor = Color(0xFF2196F3);
 
-void main() {
+void main() async { // main 함수를 async로 변경
+  WidgetsFlutterBinding.ensureInitialized(); // Flutter 엔진 초기화 확인
+  await Firebase.initializeApp( // Firebase 초기화
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   // Run the application with MultiProvider for state management
   runApp(
     MultiProvider(

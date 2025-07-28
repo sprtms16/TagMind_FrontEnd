@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624333426683",
+    "project_id": "tagmind-f6408",
+    "storage_bucket": "tagmind-f6408.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624333426683:android:089e4be48f404dc2e9c55e",
+        "android_client_info": {
+          "package_name": "com.example.tagmind_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTDJsF8YC3Cfb5rZ7EnBkx1OTfX7Uhqe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

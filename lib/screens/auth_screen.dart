@@ -51,6 +51,26 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  // Handles Google Sign-In
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle();
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +108,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         if (value!.isEmpty || !value.contains('@')) {
                           return 'Please enter a valid email address.';
                         }
-                        return null;
+                          return null;
                       },
                       keyboardType: TextInputType.emailAddress, // Keyboard type for email
                       decoration: InputDecoration(
@@ -118,22 +138,43 @@ class _AuthScreenState extends State<AuthScreen> {
                     if (_isLoading)
                       CircularProgressIndicator() // Show loading indicator when submitting
                     else
-                      ElevatedButton(
-                        child: Text(_isLogin ? 'Login' : 'Signup'), // Button text changes based on mode
-                        onPressed: _trySubmit, // Call submit function on press
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            child: Text(_isLogin ? 'Login' : 'Signup'), // Button text changes based on mode
+                            onPressed: _trySubmit, // Call submit function on press
+                          ),
+                          if (!_isLoading)
+                            TextButton(
+                              child: Text(_isLogin
+                                  ? 'Create new account'
+                                  : 'I already have an account'),
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin; // Toggle mode
+                                });
+                              },
+                            ),
+                          SizedBox(height: 10),
+                          // Google Sign-In Button
+                          ElevatedButton.icon(
+                            icon: Image.asset(
+                              'assets/images/google_logo.png', // Google 로고 이미지 경로
+                              height: 24.0,
+                            ),
+                            label: Text('Google로 로그인'),
+                            onPressed: _signInWithGoogle,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white, // Google 버튼 배경색
+                              foregroundColor: Colors.black, // Google 버튼 글자색
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(color: Colors.grey), // 테두리 추가
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    // Toggle between login and signup modes
-                    if (!_isLoading)
-                      TextButton(
-                        child: Text(_isLogin
-                            ? 'Create new account'
-                            : 'I already have an account'),
-                        onPressed: () {
-                          setState(() {
-                            _isLogin = !_isLogin; // Toggle mode
-                          });
-                        },
-                      )
                   ],
                 ),
               ),
